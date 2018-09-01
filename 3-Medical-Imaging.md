@@ -49,6 +49,15 @@ While trying to decide for a object detection algorithm, the question - How to m
 - Accurary recall precision, ... -> sehr kurz fassen
 - mAP
 
+http://users.isr.ist.utl.pt/~wurmd/Livros/school/Bishop%20-%20Pattern%20Recognition%20And%20Machine%20Learning%20-%20Springer%20%202006.pdf
+
+image wrong vs good classification vs worse matching Than accuracy, precision, recall
+
+worse match -> mAP
+cite precision recall sofia?
+
+
+
 ### Supervised object detection with manual feature engineering
 
 The build of a supervised object detection system requires the definition of multiple abstract pipeline steps shown in figure 3.1. (Szeliski 2011, p. 697). In the last step of classification an algorithms for either instance or class recognition can be applied. Each previous step has to be engineered based on the dataset. Therefore multiple algorithms are available, the most important will be briefly introduced afterwards.
@@ -343,6 +352,8 @@ As shown in paper Holger this general imaging pipeline can be extended und verfe
 outperformed by simpler models such as rigid templates
 [10] or bag-of-features [44] DPM paper The Dalal-Triggs detector [10] -->
 
+While  sliding  window  approaches  never  completely disappeared, they had gone out of favor after the heydays of HOG [4] and DPM [7] d
+
 ### Neural Nets for object detection
 
 Even thought Machine Learning approaches have been proven to handle most imaging problems very well, the rise of neural networks seems to outperform these methods <!--source -->. All state-of-the-art algorithms in object detection are deep learning algorithms, commonly neural nets<!--source-->. This chapter will provide a brief introduction into neural nets, with the focus on convolutional neural nets.
@@ -422,7 +433,7 @@ A good reference architecture for convolution neural networks is called VGGNet. 
 
 ![Convolutional Neural Network with many layers](images/sample-cnn)
 
-Many base architecture like VGG are came up in the ImageNet competition ILSVRC {Russakovsky 2014 #53}. The contest was the major breakthrough for convolutional neural networks for image classification {Russakovsky 2014 #53} with the AlexNet  submission by Krizhevsky et al. {Krizhevsky 2012 #55}. Most current OD networks are based on the ResNet-101<!--cite--> architecture from the 2015 winning submission <!--cite cornernet + review -->. Figure xy show the configuration of this network. 
+Many base architecture like VGG are came up in the ImageNet competition ILSVRC {Russakovsky 2014 #53}. The contest was the major breakthrough for convolutional neural networks for image classification {Russakovsky 2014 #53} with the AlexNet  submission by Krizhevsky et al. {Krizhevsky 2012 #55}. Most current OD networks are based on the ResNet-101<!--cite--> architecture from the 2015 winning submission <!--cite cornernet + review -->. Figure xy shows the configuration of this network. 
 
 ![img](images/ResNet)
 
@@ -441,6 +452,11 @@ The usability of CNN architectures as backbone network for object detection does
 <!-- go into detail for different techniques??? https://towardsdatascience.com/neural-network-architectures-156e5bad51ba -->
 
 #### Object Detection Networks
+
+<!-- reference to taxonomy genereic object detection-->
+
+<!-- has also many things: http://papers.nips.cc/paper/5207-deep-neural-networks-for-object-detection.pdf DetectorNet  
+interesing DPM  and Fast, Accurate Detection of 100,000 Object Classes on a Single Machine  -->
 
 With the rise of convolutional networks image classification, CNNs have also been used for the prior localization step. Even though network architectures have changed, ConvNets are still used for the complete object detection pipeline. With winning ImageNet 2012 object localization challenge AlexNet showed the capabilities of CNNs for how localisation tasks <!--source -->, even though they make no publications on their specific approach {Sermanet 2013 #57}. The OverFeat publication {Sermanet 2013 #57} defined the first state-of-the-art approach by winning 2013 challenge <!-- source --> and providing a concrete explanation how ConvNets implement object detection using a sliding-window approach.
 
@@ -461,7 +477,7 @@ Region proposal networks (RPNs) where introduced by Regions with CNN (R-CNN){Gir
 [^yolo-refinedet]: Even tough it should be noted that the RefineDet  is more accurate on real time tasks using a Titan X GPU, YOLO has been chosen for a  variety of reasons explained at the end of the section.
 
 Classification (or regression) based networks approaches for neural object detection networks where shown by many different networks based on AlexNet. This section aims to provide a brief overview over the development of one-stage detectors. The description might have a slight focus on YOLO, since it is the authors preferred network of choice for real time tasks [^yolo-refinedet]. As visualized in figure **xy**, this section explains the current state-of-the-art networks based on their features development.
-The DeepMultiBox, often called simply MultiBox, used a single NN by implementing a classifier known as Deformable  Part  Model (DPM) in a deep convolutional network {Erhan 2013 #62}. 
+The DeepMultiBox, often called simply MultiBox, used a single NN by implementing a classifier known as Deformable  Part  Model (DPM) in a deep convolutional network {Erhan 2013 #62}. <!--Inside-outside net (ION), DetectorNet  <!--source  G-CNN <!--source -->
 The AttentionNet was first to integrate a object existence estimation and bounding box optimization into a single convolutional network. With iterative predictions the net approximates an object. However the AttentionNet cloud only detect a single class per image.
 G-CNN in contrast is able to detect multiple classes by splitting the image into a multi-scale regular grid. Each box is classified and afterwards corrected. After multiple iterations of regression the boxes are correct. The main problem of G-CNN are small or highly overlapping objects.
 
@@ -480,16 +496,18 @@ The anchor boxes introduced by SSD did influence the new network architecture of
 YOLOv2 improves also the training. It uses batch normalization in the convolutional layer to reduce the impact of outliners and therefore speed up convergence and stabilize the model. The new version introduces also a second stage of training the classifier for 10 epochs in the target resolution <!-- explain epochs -->. YOLOv2 introduces  also a multi-scale training. Every 10 iterations the network trains on a randomly different input size $s \in \{320,352, \dots, 608\}$
 Finally YOLOv2 introduces hierarchical classification, by using multiple stacked softmax algorithms instead of one which the called WordTree based on the WordNet. So if a specialized class has a low probability a more general class can still be detected. For the backpropagation only the classification loss is used. While YOLOv2 was trained for a WordTree with 1k categories the additional proposed VOLO9000 detects used a 9418 WordTree node to be able to predict over 9000 classes.
 
-The current competitor in the field of one-stage detectors released afterwards, are RetinaNet, RefineDet, YOLOv3  and Cornernet. Current one-stage object detection algorithms detect objects based on the regression boxes. Detecting small objects requires a feature map more dense, which basically more possible boxes to classify. 
+The current competitor in the field of one-stage detectors released afterwards, are RON, RetinaNet, RefineDet, YOLOv3  and CornerNet. Current one-stage object detection algorithms detect objects based on the regression boxes. Detecting small objects requires a feature map more dense, which basically more possible boxes to classify. 
+The Reverse Connection with Objectness Prior Networks (RON) uses multiscale detection using reverse connections and primarily a objectness filter to reduce the searching space for the classifier. However the succeeding algorithms performed significantly better that RON on the COCO and VOC challenges.
 The RetinaNet paper showed that dense layers have a imbalance of foreground and background class distributions. The surplus of non object background boxes are distracting make training inefficient and lead to degenerate model. The authors of RetinaNet introduced an alternative to the standard cross entropy loss called the focal loss: $FL(p_t)=-(1-p_t)^\gamma \log(p_t)$. The figure xy shows how a higher $\gamma$ shift the loss focus to harder (foreground) boxes, while $\gamma = 0$ is the standard cross entropy loss. The paper proposes an additional balancing factor $\alpha_t$ which can weights foreground/background examples differently. This new loss enables the use of much more bounding box proposals. The network architecture of  RetinaNet is based on the Feature Pyramid Network detecting on different scales shown in figure xy.
-The RefineDet network is at time of this thesis the most accurate object detector with real time processing. It addresses the class imbalance problem with a new architecture of two inter-connected modules (see figure xy). The modules are called the anchor refinement module (ARM) and the object detection module (ODM). The ARM goal is to reduce the search space for the classifier by implementing a negative anchor filtering mechanism. Anchor boxes which have a top loss based on threshold i.e. $\theta = 0.99$ are not passed to the ODM module. The ratio between  for- and background patches should be below $3 : 1$. The feature layer of the ARM are converted by the Transfer Connection Blocks (TCBs) into the ODM input dimensions.  Based on the passed anchors and the TCB layers the ODM module aims to regresses accurate locations for the objects and predicts multi-class labels for each. Like previous methods the ODM uses convolutions for the regression and classification. The feature extraction ahead of the  two-step cascade regression, can be any  pretrained backbone network. For the COCO and VOC challenges the authors used VGG-16 and ResNet-101.
+The Single-Shot Refinement Neural Network for Object Detection (RefineDet) is at time of this thesis the most accurate object detector with real time processing. It addresses the class imbalance problem with a new architecture of two inter-connected modules (see figure xy). The modules are called the anchor refinement module (ARM) and the object detection module (ODM). The ARM goal is to reduce the search space for the classifier by implementing a negative anchor filtering mechanism. Anchor boxes which have a top loss based on threshold i.e. $\theta = 0.99$ are not passed to the ODM module. The ratio between  for- and background patches should be below $3 : 1$. The feature layer of the ARM are converted by the Transfer Connection Blocks (TCBs) into the ODM input dimensions.  Based on the passed anchors and the TCB layers the ODM module aims to regresses accurate locations for the objects and predicts multi-class labels for each. Like previous methods the ODM uses convolutions for the regression and classification. The feature extraction ahead of the  two-step cascade regression, can be any  pretrained backbone network. For the COCO and VOC challenges the authors used VGG-16 and ResNet-101.
 
-for the classifier
+With the success of RetinaNet the authors of YOLO published a third version. YOLOv3 brings improvements on the feature extraction network as well as on the way of classification and training.
+The new Darknet-53 feature extractor has more layers and uses  skip connections like the residual networks. It has a similar accuracy as ResNet-152 but is $2\times$ faster. The new version replaces the softmax classifier with independent logistic classifiers for each category with a binary cross-entropy loss for the class predictions. The actual predictions are perform at three different scales, similar to the Feature Pyramid Networks<!-- source -->, with a resulting tensor of  $S \times S \times [3*(4+1+C)]$. Therefore the dimension prios are have been modified. Instead of five YOLO used now 9 dimension prior which are divided by there dimension into the 3 different scales. 
+This version of YOLO has a as higher localization error in comparison to RetinaNet and RefineDet, but is faster than first one and is better scalable in constraint environments with the adaptible input size and the sligher Tiny YOLOv3 version <!--https://github.com/pjreddie/darknet/blob/master/cfg/yolov3-tiny.cfg -->. In the course of this thesis YOLOv3 will simply be referenced as YOLO.
 
-RON
-
-YOLOv3 = residential
-Cornernet
+A recent paper followed another different approach. Instead of detecting bounding box coordinates it predicts only the two locations of the top-left und bottom-right corners. For a better corner detection the algorithm introduces new kind of pooling layer as called the corner pooling. 
+The base feature extraction uses 2 stacked hourglass modules <!--source --> with a complete depth of 104. The design of the hourglass (see fig xy) aims to extract features among different scales of the image <!-- scale invariant --> to provide a dense prediction <!--source -->. It does stepwise down sample the image and uses a subsequent up sampling afterwards, with skipped connections at each stage to derive information from different scales. Based on the proposed focal loss of the RetinaNet<!--source -->, CornerNet uses an adapted focal loss for the hourglass networks to filter distracting background boxes . <!--source -->
+As result the Hourglass network <!--source --> provides two feature heatmaps one for  top-left and another for bottom-right corners. Both heatmaps have a prediction module using corner pooling (see fig xy) to derive the corner heatmaps, embeddings and ground truth offsets of the objects. Each corner heatmap has $C$ channels one for each object category. To determine if a pair of points belong to the same bounding box the prediction module used the embedding-vectors of  the corner pooling based on Newell et al.<!--source --> Associative Embedding method. If the embeddings difference is small the points belong to the same box. Based on heatmap maximum and ground trouth an offset is calculated. If the offset is used for the training loss. The loss functions penalty for negative locations is smaller, if the location is within a radius of the positive location (see fig xy). <!--source -->
 
 <!--  integrate continious  argumentation or speed  -->
 
@@ -500,65 +518,14 @@ predicts bounding boxes using hand-picked prior-->
 
 <!-- one-object rule limits how close detected objects can be-->
 
-... we will reference YOLOv3 as YOLO for now.
-
-but many researchers have achieved
-
-better accuracy for tasks using Residual-101
-
- integrating context using so called “encoder-
-
-decoder” networks where a bottleneck layer in the middle
-
-of a network is used to encode information about an input
-
-image and then progressively larger layers decode this into
-
-a map over the whole image
-
-often referred to as an hour-
-
-glass
-
-Inside-outside net (ION), DetectorNet  <!--source -->, G-CNN <!--source -->
-
-Scalable object
-detection using deep neural networks
-
-Inside-outside net: Detecting objects in context with skip pooling and recurrent neural
-networks
-
-This paper presents the first deep network based object detector that does not re-
-sample pixels or features for bounding box hypotheses and and is as accurate as ap-
-proaches that do
-
-The fundamental improvement in
-speed comes from eliminating bounding box proposals and the subsequent pixel or fea-
-ture resampling stage
-
 <!--The used a single NN by implementing a classifier known as Deformable  Part  Model (DPM) in a deep convolutional network. {Erhan 2013 #62}
 DPM is machine learning approach for object detection. It uses a part-based model, with filters based on the histogram-of-gradients detectors for feature extraction. The classification performs a latent SVM.{F Felzenszwalb 2010 #61}-->
 
-Zero-short learning (ZSL) 
+##### Review
 
-While  sliding  window  approaches  never  completely
+##### Outline
 
-disappeared, they had gone out of favor after the heydays of
-
-HOG [4] and DPM [7] d
-
-<!-- what are NMS -->
-
-<!-- reference to taxonomy genereic object detection-->
-
-<!-- has also many things: http://papers.nips.cc/paper/5207-deep-neural-networks-for-object-detection.pdf DetectorNet  
-interesing DPM  and Fast, Accurate Detection of 100,000 Object Classes on a Single Machine  -->
-
-Brief review of past networks and that write the new stuff
-
-Region Proposal Based Framework - Two stage detector
-
-Regression/Classification Based Framework - One-stage detectors
+<!-- Zero-short learning (ZSL) -->
 
 ## Commonly used technologies in medical software
 
