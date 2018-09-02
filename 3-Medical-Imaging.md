@@ -11,16 +11,16 @@ With Machine Learning (ML) computer vision did become even more powerful (Freema
 
 ### Terminology of Computer Vision tasks
 
-*Segmentation* denotes the process of dividing a data set into parts based on defined rules [@Fisher.2004, p. 229]. In the context of computer vision the image segmentation implies the grouping of the image pixels into reasonable structures like edges or regions (Fisher 2004, p. 117). <!--, the regions are also called segments (Concise CV, p. 167). Concise CV sees only regions as segmentation-->
+*Segmentation* denotes the process of dividing a data set into parts based on defined rules [@Fisher.2005, p. 229]. In the context of computer vision the image segmentation implies the grouping of the image pixels into reasonable structures like edges or regions [@Fisher.2005, p. 117]. <!--, the regions are also called segments (Concise CV, p. 167). Concise CV sees only regions as segmentation-->
 
-*Object recognition* is a closely related task with a definition focus on identifying one or more known objects in the image (Fisher 2004, p. 172). If this process includes also the objects scene position, it is an object detection process. An generic *object detection system* is based on three steps. Initially the system performs a *localization* of *object candidates*. These candidates are commonly bounding boxes (<!-- source paper with link for prove that common -->). Bounding boxes are a special case of a region of interest (RoI) being the smallest rectangular frame around an object  (Fisher 2004, p. 31). In the second stage the boxes are mapped by an classification algorithm into sets of detected objects or rejected candidates. Which sets are finally used for evaluating the algorithms performance. (Concise CV, p. 375) <!-- Whats is classification/Math -->
-Using classification algorithms directly without a prior splitting in sub regions makes the detection of multiple objects within one image impossible. Using regions of interest has also two other advantages for the regarded use case. RoI do reduce the amount of computation needed and therefore improve the speed on larger images and these regions minimize the distractions for the classification algorithm (Fisher 2004, p. 215). 
+*Object recognition* is a closely related task with a definition focus on identifying one or more known objects in the image [@Fisher.2005, p. 172]. If this process includes also the objects scene position, it is an object detection process. An generic *object detection system* is based on three steps. Initially the system performs a *localization* of *object candidates*. These candidates are commonly bounding boxes (<!-- source paper with link for prove that common -->). Bounding boxes are a special case of a region of interest (RoI) being the smallest rectangular frame around an object  [@Fisher.2005, p. 31]. In the second stage the boxes are mapped by an classification algorithm into sets of detected objects or rejected candidates. Which sets are finally used for evaluating the algorithms performance. [@Klette.2014, p. 375] <!-- Whats is classification/Math -->
+Using classification algorithms directly without a prior splitting in sub regions makes the detection of multiple objects within one image impossible. Using regions of interest has also two other advantages for the regarded use case. RoI do reduce the amount of computation needed and therefore improve the speed on larger images and these regions minimize the distractions for the classification algorithm [@Fisher.2005, p. 215]. 
 
 As further explained in the previous chapter the image source for this use case have been high resolution scans and photography's with multiple relevant objects which are technical reasons to use object detection. From a physician point of view object detection is helpful to understand to focus reduce object shaking in a time series. Even tough segmentation can be applied afterwards, it might distract the analyst in this specific scenario. Therefore this paper uses an object detection system and will not focus on segmentation algorithms. <!--source + nicht gut durchgebründet, da use case unklar-->
 
 In general object recognition divides into two broader categories: instance recognition and class recognition. 
-Instance recognition or instance-level recognition  is are technics to re-recognizing objects by abstracting different scaling, viewpoints, lightning and other aspects of the picture (Szeliski 2011, p.685). Commonly these algorithms classify using viewpoint-invariant 2D features (Vedaldi 2018, Szeliski 2011 p.685f).  This works pretty good to recognize popular buildings or known faces. <!--but for faces = limitation source Google Googles key point extraction-->
-Class recognition, also known as category-level or generic object recognition aims to solve more abstract problem of matching any instance of a generic class. This task is harder to solve. For Example having a picture of a pug[^1] and a terrier even both are kinds of dogs simple feature extraction form the image might not be optimal.
+Instance recognition or instance-level recognition  is are technics to re-recognizing objects by abstracting different scaling, viewpoints, lightning and other aspects of the picture [@Szeliski.2011, p.685]. Commonly these algorithms classify using viewpoint-invariant 2D features [@Vedaldi.2018, @Szeliski.2011 p.685f].  This works pretty good to recognize popular buildings or known faces. <!--but for faces = limitation source Google Googles key point extraction-->
+Class recognition, also known as category-level or generic object recognition aims to solve more abstract problem of matching any instance of a generic class. This task is harder to solve. For Example having a picture of a pug[^1] and a terrier even both are kinds of dogs simple feature extraction form the image might not be optimal. <!--source -->
 The goal of our client is a stable and general algorithm for it's datasets. 
 Recent scientific research does also focus on generic object recognition, since latest publications show that deep learning generic object detection does outperform, classical machine learning if if uses as instance recognition. Therefore the paper will focus mostly on the category object detection algorithms. 
 
@@ -28,43 +28,52 @@ Recent scientific research does also focus on generic object recognition, since 
 
 Besides the scientific claims Computer Vision tasks have a big engineering part as well. By this meaning multiple algorithms and approaches should be considered. Statistical approaches have been proven to be a useful way to solve Computer Vision problems. Especially on small datasets there are better to apply<!--source ML vs deep learning-->. Therefore statistical approaches and classic machine learning algorithms will presented ahead, before diving into complex class recognition algorithms, which will require deep learning. <!-- ML = only instance recognition--> <!-- compare ML and DL also to understand heading--> <!-- or more likely supervised vs. unsupervised -->
 
-Machine Learning in the context of medical image analysis has been quite common in past years, until it was gradually replaced by deep learning <!--source-->. Many common medical applications rely on machine learning algorithms.<!-- name some example + they have to be common + paper of methods --> This rather helpful since most medical applications provide only a small set of images.<!--medical image database, for validation --> In these use cases applying deep learning, if even possible, can only be achieved various strategies like using pretrained weights for non medical images or utilizing data augmentation (Shen 2017, p. 223). To baseline the score of the deep learning models well proven classical machine learning models should be used. Therefore supervised machine learning provides a good alternative. Therefore supervised machine learning with handcrafted features is a valid alternative to unsupervised object detectors. The next section will solely review the supervised object detectors, that have been proven in a medial application. <!-- handcrafted vs supervised-->
+Machine Learning in the context of medical image analysis has been quite common in past years, until it was gradually replaced by deep learning <!--source-->. Many common medical applications rely on machine learning algorithms.<!-- name some example + they have to be common + paper of methods --> This rather helpful since most medical applications provide only a small set of images.<!--medical image database, for validation --> In these use cases applying deep learning, if even possible, can only be achieved various strategies like using pretrained weights for non medical images or utilizing data augmentation [@Shen.2017, p. 223]. To baseline the score of the deep learning models well proven classical machine learning models should be used. Therefore supervised machine learning provides a good alternative. Therefore supervised machine learning with handcrafted features is a valid alternative to unsupervised object detectors. The next section will solely review the supervised object detectors, that have been proven in a medial application. <!-- handcrafted vs supervised--><!--source-->
 
 ### Performance evaluation of Computer Vision algorithms
 
 
 
-While trying to decide for a object detection algorithm, the question - How to measure its perfomance? - comes in mind. Computer vision algorithm can be measured using three major categories: 
+The overall goal of a computer vision algorithms is to perform as good as the human eye. But a generic algorithm that matches this goal in all possible task has not been published yet. So how should current object detection algorithm are measured? A common computer vision algorithm is evaluated on three categories [@Jahne.2000, p. 6]: 
 
-> Successful solution of task. Any practitioner gives this a top priority.
-> But also the designer of an algorithm should define precisely for
-> which task it is suitable and what the limits are.
-> Accuracy. This includes an analysis of the statistical and systematic
-> errors under carefully defined conditions (such as given signal-tonoise
-> ratio (SNR), etc.).
-> Speed. Again this is an important criterion for the applicability of an
-> algorithm.
+*Successful solution of task* - It is the main goal to solve the given problem. Based on the kind of task the algorithms should be chosen, not otherwise. To provide a solid ground for decisions the next chapters <!-- link? --> will discuss the different algorithms applicable for this thesis use case.
+*Accuracy* - The algorithm solution should provide detections that overlap with the ground truth. The result need to be stable under different circumstances without under- or overfitting.
+*Speed* - The time and the number of binary operations that are necessary to predict one image determines if the algorithm is applicable for a certain use case or environment.
 
-- Book 3 things concise computer vision
-- Accurary recall precision, ... -> sehr kurz fassen
-- mAP
+In general algorithms have to find a tradeoff between accuracy and speed. State-of-the-art object detection algorithms with an higher accuracy are commonly slower than competitors <!-- cite paper tradeof object detection algorithms -->.
+As the speed of a detector can simply be measured by the time for one prediction or the frame rate  in real time solutions the accuracy is measured by statistical methods presented in the following.
 
-http://users.isr.ist.utl.pt/~wurmd/Livros/school/Bishop%20-%20Pattern%20Recognition%20And%20Machine%20Learning%20-%20Springer%20%202006.pdf
+<!-- new section heading ? -->So how is the accuracy for one dataset measured. Object detection <!-- paper unsupervised OD networks --> need a ground truth. The ground truth is measured or annotated data, which is considered to be reasonably accurate [@Klette.2014, p. 162]. The data is randomly spitted in the training and test set, by a common ratio such as 80-20. <!--ource for split --> The algorithms proposals should overlap with the reference data from the test set.
 
-image wrong vs good classification vs worse matching Than accuracy, precision, recall
+<center><img src="images/ground-trouth.png" style="zoom:20%">  <img src="images/IoU.png" style="zoom:20%"></center>
 
-worse match -> mAP
-cite precision recall sofia?
+The overlapping of ground truth and proposal is calculated with the Intersection over Union (IoU) [@Everingham.2010, @Lin.2014]. The IoU is defined as follow, with the proposed box $B_p$ and ground truth $B_{gt}$ [@Klette.2014]. 
+<!-- Use icons to simbolize from here https://www.pyimagesearch.com/2016/11/07/intersection-over-union-iou-for-object-detection/ -->
+$$
+IoU^{truth}_{pred} = \frac{A (B_p \cap B_{gt})}{A (B_p \cup B_{gt})}
+$$
 
+If $IoU^{truth}_{pred} > 0.5$ the object considered as correctly detected. Whit the IoU the complete test can be evaluated, resulting in a basic confusion matrix of ground truth vs predictions. Using this matrix four unique labels can be assign to the objects (see fig xy). <!--source -->
+The predictions (positives) split the numbers of true-positives $tp$ or false-positives $fp$. The undetected objects
+analogously into true-negatives $tn$ or false-negatives $fn$. Since most dataset do not annotate negative examples, the $tn$ are often zero. Based on these numbers several metrics are constructed. [@Klette.2014]
+<!-- parallel formulars -->
+$$
+p = \frac{tp}{tp+fp} ~ r = \frac{tp}{tp+fn}
+$$
+The precision $p$ measures how much of the predictions are correct. The recall r$RC$ on the other hand shows which ratio of the ground truth is correct classified. The relation of precision and recall is typically a tradeoff. If for example all possible objects are chosen, the recall tends against one, where as the precision is very low. This tradeoff can be plotted as a precision-recall (PR) curve, which is used to calculate the average precision <!-- show such a plot? -->.  [@Klette.2014]
 
+$$
+\int_0^1 p(r) dr  \approx \sum_{k=1}^N P(k)\Delta r(k)
+$$
+The average precision (AP) also called the mean  average precision (mAP) is the precision averaged over all values of the recall or basically the area under the PR curve (see form xy). This is approximated as the sum over all precisions at every possible IoU threshold value ($P$), multiplied with the change in the recall $\Delta r$ for all $N$ images [@McCann.2011]. The thresholds depend on the challenges. PASCAL VOC uses a mAP at $IoU=.50$ denoted as $AP_{50}$. Common object detection algorithms are competing in  COCOs standard mAP uses 10 different thresholds at $IoU=.50:.05:.95$ [@Dollar.2018].
 
 ### Supervised object detection with manual feature engineering
 
-The build of a supervised object detection system requires the definition of multiple abstract pipeline steps shown in figure 3.1. (Szeliski 2011, p. 697). In the last step of classification an algorithms for either instance or class recognition can be applied. Each previous step has to be engineered based on the dataset. Therefore multiple algorithms are available, the most important will be briefly introduced afterwards.
+The build of a supervised object detection system requires the definition of multiple abstract pipeline steps shown in figure 3.1. [@Szeliski.2011, p. 697]. In the last step of classification an algorithms for either instance or class recognition can be applied. Each previous step has to be engineered based on the dataset. Therefore multiple algorithms are available, the most important will be briefly introduced afterwards.
 
 For a general understanding of these algorithms some key terms of CV and ML should be clarified. 
-A *key point* (also named interest point) is an image coordinate surrounded by particular image intensities, like edges (Concise, p.333). Each key point has a descriptor summarizing its properties.
-*Descriptors* are the numerical representations derived from measured or calculated image properties. Each descriptor $x = (x_1, \dots , x_n) $ points into an n-dimensional real space $R_n$, called the descriptor space. In the general context of classification descriptors are called features. The term descriptor is used to avoid the disambiguity with the *image feature* composed by one more key points and descriptors. (Concise) <!-- example??, image?--><!-- rel. descriptior <-> feature-->
+A *key point* (also named interest point) is an image coordinate surrounded by particular image intensities, like edges [@Concise, p.333]. Each key point has a descriptor summarizing its properties.
+*Descriptors* are the numerical representations derived from measured or calculated image properties. Each descriptor $x = (x_1, \dots , x_n) $ points into an n-dimensional real space $R_n$, called the descriptor space. In the general context of classification descriptors are called features. The term descriptor is used to avoid the disambiguity with the *image feature* composed by one more key points and descriptors. [@Concise] <!-- example??, image?--><!-- rel. descriptior <-> feature-->
 The *Classifier* has the task to assign class numbers to the descriptors, with the aim to find the final image features. In the initial step it applies the classes to the descripts from the learning set. With every training step then to the new generated descriptors. This process is called *classification*. <!-- todo other general ML book -->
 The algorithm of defining or training the classifier is called the *Learning algorithm*. Such an algorithm can also perform an statistical combination of multiple weak classifiers into one strong classifier. <!-- source -->
 
@@ -72,20 +81,20 @@ The algorithm of defining or training the classifier is called the *Learning alg
 
 #### Image Preprocessing
 
-Most detector algorithms performing best under specific circumstances. To make use of there optimal performance ratio the images are often preprocessed. The preprocessing does involve basic operations like cropping, up- or downscaling or color space conversion. It can have a tremendous impact on the results as shown by Johansson et al {Johansson 2016 #28, p. 6ff}. Preprocessing is also required for most neural networks <!-- source--> . 
+Most detector algorithms performing best under specific circumstances. To make use of there optimal performance ratio the images are often preprocessed. The preprocessing does involve basic operations like cropping, up- or downscaling or color space conversion. It can have a tremendous impact on the results as shown by Johansson et al [@Johansson.2016, p. 6ff]. Preprocessing is also required for most neural networks <!-- source--> . 
 
 #### Key Patch detection and Feature Extraction
 
 The detection of objects in images does require key features to find and distinct theses objects. Therefore classical image analysis will derive image descriptors in the first step of each training pipeline. Image descriptors have different ranges of complexity and can also be an assemblement of multiple simpler detectors. 
 Descriptors can be used to extract local and global features. Global feature represent properties of the image such as width or brightness, local features on the other hand are derived by detecting key points in the image and describing the area around these points. (book springer, p. 1, https://pdfs.semanticscholar.org/322f/f387087134ac776a4270cd55e7f3334edeb2.pdf)
-The sematic context and localization of anchor points makes local features much more important for object detection {Tuytelaars 2007 #30}. Therefore only the key algorithms for local feature detection and description are presented here. Many works reviewed these algorithms and since a complete review of all algorithms exceeds the scope of this work, only the common algorithms of these reviews will be presented in this section. (Zhang 2006 #27; Materka 1998; Ojha 2015; Mukherjee 2013; Uchida 2016; Remondino 2006)
+The sematic context and localization of anchor points makes local features much more important for object detection [@Tuytelaars.2007]. Therefore only the key algorithms for local feature detection and description are presented here. Many works reviewed these algorithms and since a complete review of all algorithms exceeds the scope of this work, only the common algorithms of these reviews will be presented in this section. [@Zhang.2006, @Materka.1998, @Ojha.2015, @Mukherjee.2013, @Uchida.2016, @Remondino.2006]
 <!-- Characteristics why importantA Comparative Experimental Study of Image Feature Detectors and Descriptors, -->
-Feature descriptors and detectors a two kinds of different algorithms. *Detector*s chooses 2D locations, like points or regions, if these locations are geometrically  stable  under different transformations and containing high information content, like the  local maximum of a cornerness metric. The results of the algorithms are 'interest points', 'corners', 'affine  regions' or 'invariant regions' that are stable under different transformations. A *descriptor* on the other hand is a 2D vector of pixel information, which describes the image patch around the position provided by an detector.({Remondino 2006 #35}, {Canclini 2013 #33}, {Uchida 2016 #36})
-Together the image-patch and its descriptor build a local feature. These features are then used for computer vision tasks,like classification segmentation or detection (Source concise computer vision,{Canclini 2013 #33},).
+Feature descriptors and detectors a two kinds of different algorithms. *Detector*s chooses 2D locations, like points or regions, if these locations are geometrically  stable  under different transformations and containing high information content, like the  local maximum of a cornerness metric. The results of the algorithms are 'interest points', 'corners', 'affine  regions' or 'invariant regions' that are stable under different transformations. A *descriptor* on the other hand is a 2D vector of pixel information, which describes the image patch around the position provided by an detector. [@Remondino.2006, @Canclini.2013, @Uchida.2016]
+Together the image-patch and its descriptor build a local feature. These features are then used for computer vision tasks,like classification segmentation or detection [@Klette.2014, @Canclini.2013].
 
 ##### Detectors for interest point, corners or regions
 
-Over the last fourth years since the the first corner detection algorithms (source) many scientist have been developing algorithms for different use cases.  So there are different way to sort these algorithms in these field as well. Some reviews distinct these algorithms based on their internal algorithm operations as contour curvature based, intensity based, color-based methods, (parametric) models based or machine learning methods ({Schmid 2000 #31};{Tuytelaars 2007 #30}, {Lenc 2018 #32}). Other papers group based on the detectors characteristics like viewpoint invariant, affine-invariant, scale-invariant or rotation-invariant ({Uchida 2016 #36}). Since this work will not actually go into the detailed implementation of these algorithms and the methods are presented for a general overview, the outlined methods are divided by there application ({Canclini 2013 #33}, {Remondino 2006 #35}, {Ojha 2015 #38}).
+Over the last fourth years since the the first corner detection algorithms (source) many scientist have been developing algorithms for different use cases.  So there are different way to sort these algorithms in these field as well. Some reviews distinct these algorithms based on their internal algorithm operations as contour curvature based, intensity based, color-based methods, (parametric) models based or machine learning methods [@Schmid.2000, @Tuytelaars.2007, @Lenc.2018]. Other papers group based on the detectors characteristics like viewpoint invariant, affine-invariant, scale-invariant or rotation-invariant [@Uchida.2016]. Since this work will not actually go into the detailed implementation of these algorithms and the methods are presented for a general overview, the outlined methods are divided by there application [@Canclini.2013, @Remondino.2006, @Ojha.2015].
 
 <!-- einfache aufspaltung nicht hilfreich für komplexe -->
 
@@ -147,22 +156,22 @@ Fast algorithm for Multiple-Circle detection on images using Learning Automata h
 
 <!-- This family of descriptors represents features as binary bit vectors. To compute the features, image pixel point-pairs are compared and the results are stored as binary values in a vector. -->
 
-Once the locations of features in the image have been detected, the require a description or a context to find the same locations in other images (also called feature matching) ({opencv dev team 2014 #0}). This process is also called the feature extraction, which is a common part of a common image analysis pipeline. Main importance for a robust object detection is the descriptors invariance for transformations ({Mukherjee 2015 #48}). 
-Even tough descriptors can be distingue by there algorithms ({Mikolajczyk 2003 #41}, {Tombari 2013 #42}), it will not be of importance in this section. This section will simply introduce the most recent and common feature descriptors based on the reviews: ({Tafti 2017 #43}{Tareen 2018 #45}{Karami 2017 #46}, {Lenc 2018 #32}, {Guo 2016 #47})
+Once the locations of features in the image have been detected, the require a description or a context to find the same locations in other images (also called feature matching) [@opencvdevteam.2014]. This process is also called the feature extraction, which is a common part of a common image analysis pipeline. Main importance for a robust object detection is the descriptors invariance for transformations [@Mukherjee.2015]. 
+Even tough descriptors can be distingue by there algorithms [@Mikolajczyk.2003, @Tombari.2013], it will not be of importance in this section. This section will simply introduce the most recent and common feature descriptors based on the reviews: [@Tafti.2017, @Tareen.2018, @Karami.2017, @Lenc.2018, @Guo.2016].
 
 <!-- noch dazu? https://link.springer.com/content/pdf/10.1007%2Fs00138-015-0679-9.pdf -->
 
-**SIFT** - The Scale-Invariant Feature Transform (SIFT) descriptor is still very popular even since it has been proposed in 1999 and completely released in 2004. The SIFT algorithm contains both, the key point localization and its description. The Difference-of-Gaussians (DoG) is used as approximation the Laplacian of Gaussian (LoG) to find local maxima at different scales of the image. The descriptor analysis the 16² surrounding area of the key point. This area is then split in 16 block of 4² size, where a 8 bin orientation histogram is created for each. This gives a total of 128 bin values.
-The algorithm has been proven to be invariant to image rotations, scale, and limited affine variations, where it does even outperform even newer algorithms ({Tareen 2018 #45}).  The main drawbacks of SIFT are the high computational cost and its patent. 
+**SIFT** - The Scale-Invariant Feature Transform (SIFT) descriptor is still very popular even since it has been proposed in 1999 and completely released in 2004. The SIFT algorithm contains both, the key point localization and its description. The Difference-of-Gaussians (DoG) is used as approximation the Laplacian of Gaussian (LoG) to find local maxima at different scales of the image. The descriptor analysis the 16² surrounding area of the key point. This area is then split in 16 block of 4² size, where a 8 bin orientation histogram is created for each. This gives a total of 128 bin values.<!--source -->
+The algorithm has been proven to be invariant to image rotations, scale, and limited affine variations, where it does even outperform even newer algorithms [@Tareen.2018].  The main drawbacks of SIFT are the high computational cost and its patent.  <!--source -->
 <!-- formel ??? -->
 
-**SURF** - Speeded Up Robust Features (SURF), developed in 2008, addresses the main issue of SIFT as being to slow for real time applications <!--source -->. Instead of the DoG approximation SURF uses the  determinant of Hessian matrix for the different scales and location. For each determinant uses four convolutions with box filters as LoG approximation, which can be calculated in parallel for different scales using integral images. As descriptor, SURF uses 64 or 128 bin values based on a distribution of  Haar-like features, which is a more time-efficient way of calculating the  weighted sums in rectangular sub windows.
+**SURF** - Speeded Up Robust Features (SURF), developed in 2008, addresses the main issue of SIFT as being to slow for real time applications <!--source -->. Instead of the DoG approximation SURF uses the  determinant of Hessian matrix for the different scales and location. For each determinant uses four convolutions with box filters as LoG approximation, which can be calculated in parallel for different scales using integral images. As descriptor, SURF uses 64 or 128 bin values based on a distribution of  Haar-like features, which is a more time-efficient way of calculating the  weighted sums in rectangular sub windows.<!--source -->
 The SURF features are invariant to rotation and scale as well, but are more sensitive to viewpoint changes.
 
-**ORB** - Oriented FAST and Rotated BRIEF (ORB) has been developed in 2011 as patent free alternative to SURF and SIFT. As supposed by its name, ORB combines the  FAST key point detector and the BRIEF descriptor. It localizes corner key points with FAST and filters find top points using the Harris corner measure. Since FAST does not calculate the orientation ORB computes a intensity weighted centroid of the surrounding patch and the vector between centroid and key point notes the orientation. The BRIEF descriptor performs badly on rotation as well wherefore ORB introduced a modified version of BRIEF called rBRIEF.
+**ORB** - Oriented FAST and Rotated BRIEF (ORB) has been developed in 2011 as patent free alternative to SURF and SIFT. As supposed by its name, ORB combines the  FAST key point detector and the BRIEF descriptor. It localizes corner key points with FAST and filters find top points using the Harris corner measure. Since FAST does not calculate the orientation ORB computes a intensity weighted centroid of the surrounding patch and the vector between centroid and key point notes the orientation. The BRIEF descriptor performs badly on rotation as well wherefore ORB introduced a modified version of BRIEF called rBRIEF.<!--source --><!--source -->
 ORB features are very accurate under geometric transformations, even tough some descriptors are performing better on scale changes. ORB is also one of the fastest algorithms. <!-- scale space pyramid? -->
 
-**BRISK** - The algorithm Binary Robust Invariant Scalable Keypoints (BRISK), which was developed in 2011, is also based on corner detection. It uses the key points of the AGAST algorithm filtered by the same  FAST Corner score. <!-- what is the FAST corner score? is it really the same? -->
+**BRISK** - The algorithm Binary Robust Invariant Scalable Keypoints (BRISK), which was developed in 2011, is also based on corner detection. It uses the key points of the AGAST algorithm filtered by the same  FAST Corner score. <!-- what is the FAST corner score? is it really the same? --><!--source -->
 
 Binary Robust Invariant
 Scalable Keypoints (BRISK) in 2011 [18], which detects
@@ -269,9 +278,9 @@ Sliding Window -> Cell Profiler
 
 Markhov Random field vs. Histogram
 
-Evaluation of FD is important (Awad 2016, p. 1)
+Evaluation of FD is important [@Awad.2016, p. 1]
 
-Image descriptor algorithms commonly specialize on the detection of specific image attributes. <!--source image descriptor attributes --> Most descriptors fit in the following distinction of attributes (Ojha 2015):
+Image descriptor algorithms commonly specialize on the detection of specific image attributes. <!--source image descriptor attributes --> Most descriptors fit in the following distinction of attributes [@Ojha.2015]:
 
 
 
@@ -384,7 +393,7 @@ Training neural networks is commonly done by the use of the *backpropagation* al
 
 #### Convolutional Neural Networks
 
-Neural Networks have no general architecture build for every use case. Instead a wide variety of architectures does exists for different use cases {van Veen 2016 #49}. In the healthcare uses cases 5 architectures are very common recurrent neural networks (RNNs), bolzman machines (BM), deep belief networks (DBN), convolutional neural networks  (CNN) and Auto Encoders (AE) {Ravì 2017 #51} <!-- I definitly had a paper at hand showing only AE, CNN, DBN are relevant --> For image analysis purposes the last four can be used ({Hjelm 2016 #52}). <!-- concrete example for algorithms ?? --> However it has been shown that CNN do have advantages over the other networks and should therefore used for general object detection tasks {Zhao 2018 #50}.<!-- example for advantages? --> Therefore the presented networks will solely rely on the convolutional neural network idea. <!-- architecture vs type -->
+Neural Networks have no general architecture build for every use case. Instead a wide variety of architectures does exists for different use cases {van Veen 2016 #49}. In the healthcare uses cases 5 architectures are very common recurrent neural networks (RNNs), bolzman machines (BM), deep belief networks (DBN), convolutional neural networks  (CNN) and Auto Encoders (AE) [@Ravi.2017] <!-- I definitly had a paper at hand showing only AE, CNN, DBN are relevant --> For image analysis purposes the last four can be used [@Hjelm.2016]. <!-- concrete example for algorithms ?? --> However it has been shown that CNN do have advantages over the other networks and should therefore used for general object detection tasks [@Zhao.2018].<!-- example for advantages? --> Therefore the presented networks will solely rely on the convolutional neural network idea. <!-- architecture vs type -->
 
 Convolutional Neural Networks exists since the 1980s <!--Safari NN and DL--> and have become popular with the introduction of the *LeNet-5*-Architecture<!-- source -->. In addition to simple deep neural networks CNN have two new building blocks: *convolutional layers* and *pooling layers*.<!--Safari NN and DL-->
 
@@ -397,7 +406,7 @@ of the reasons why CNNs work so well for image recognition.-->
 
 Convolutional Neural Nets got their name from the convolution operation, which is used for feature extraction from the images. Every image can be represented as an matrix as shown in figure **xy**, in general as one matrix per channel. 
 
-<center><img src="../../../Downloads/ezgif-2-fb168ad875-gif-png/frame_0_delay-0.75s.png" style="zoom:40%" />  <img src="../../../Downloads/ezgif-2-fb168ad875-gif-png/frame_1_delay-0.75s.png" style="zoom:40%" /> <img src="images/convolution-operation.png" style="zoom:100%"></center>
+<center><img src="../../../Downloads/ezgif-2-fb168ad875-gif-png/frame_0_delay-0.75s.png" style="zoom:40%" /> <img src="../../../Downloads/ezgif-2-fb168ad875-gif-png/frame_1_delay-0.75s.png" style="zoom:40%" /> <img src="images/convolution-operation.png" style="zoom:100%"></center>
 
 
 
@@ -433,23 +442,18 @@ A good reference architecture for convolution neural networks is called VGGNet. 
 
 ![Convolutional Neural Network with many layers](images/sample-cnn)
 
-Many base architecture like VGG are came up in the ImageNet competition ILSVRC {Russakovsky 2014 #53}. The contest was the major breakthrough for convolutional neural networks for image classification {Russakovsky 2014 #53} with the AlexNet  submission by Krizhevsky et al. {Krizhevsky 2012 #55}. Most current OD networks are based on the ResNet-101<!--cite--> architecture from the 2015 winning submission <!--cite cornernet + review -->. Figure xy shows the configuration of this network. 
+Many base architecture like VGG are came up in the ImageNet competition ILSVRC [@Russakovsky.2014]. The contest was the major breakthrough for convolutional neural networks for image classification [@Russakovsky.2014] with the AlexNet  submission by Krizhevsky et al. [@Krizhevsky.2012]. Most current OD networks are based on the ResNet-101<!--cite--> architecture from the 2015 winning submission <!--cite cornernet + review -->. Figure xy shows the configuration of this network. 
 
 ![img](images/ResNet)
 
 There a only a few exceptions in the best object detection algorithms. The  base network for YOLOv2 (Darknet-19) was inspired <!--cite--> from 2014 winner GoogLenet and include ideas from Network In Network, Inception, and Batch Normalization. In YOLOv3 extended the DarkNet-19 model also with ideas from the ResNet. DSOD300 feature extraction is  based on
 2016 published DenseNet. The D-RFCN + SNIP configuration from <!--cite--> uses the Dual Path Network from 2017 and CornerNet uses the Hourglass Network.
 
-The usability of CNN architectures as backbone network for object detection does primarily depend on two features as shown in  {Canziani 2016 #56}: Accuracy (measured in mAP) and Performance indicated by operations per prediction. The have to be evaluated against each. A higher accuracy requires in general more layers, which does mean more operations and therefore a lower performance. 
+The usability of CNN architectures as backbone network for object detection does primarily depend on two features as shown in  [@Canziani.2016]: Accuracy (measured in mAP) and Performance indicated by operations per prediction. The have to be evaluated against each. A higher accuracy requires in general more layers, which does mean more operations and therefore a lower performance. 
 
-<center>
-<img src="images/1535493961987.png" style="zoom: 70%"  />
-<img src="images/pratical-reasons.jpg" style="zoom: 40%" />
-<img src="images/1535494000848.png" style="zoom: 70%" />
-</center>
+<center> <img src="images/1535493961987.png" style="zoom: 70%" /> <img src="images/pratical-reasons.jpg" style="zoom: 40%" /> <img src="images/1535494000848.png" style="zoom: 70%" /> </center>
 
-
-<!-- go into detail for different techniques??? https://towardsdatascience.com/neural-network-architectures-156e5bad51ba -->
+<!-- go into detail for different techniques https://towardsdatascience.com/neural-network-architectures-156e5bad51ba -->
 
 #### Object Detection Networks
 
@@ -458,7 +462,7 @@ The usability of CNN architectures as backbone network for object detection does
 <!-- has also many things: http://papers.nips.cc/paper/5207-deep-neural-networks-for-object-detection.pdf DetectorNet  
 interesing DPM  and Fast, Accurate Detection of 100,000 Object Classes on a Single Machine  -->
 
-With the rise of convolutional networks image classification, CNNs have also been used for the prior localization step. Even though network architectures have changed, ConvNets are still used for the complete object detection pipeline. With winning ImageNet 2012 object localization challenge AlexNet showed the capabilities of CNNs for how localisation tasks <!--source -->, even though they make no publications on their specific approach {Sermanet 2013 #57}. The OverFeat publication {Sermanet 2013 #57} defined the first state-of-the-art approach by winning 2013 challenge <!-- source --> and providing a concrete explanation how ConvNets implement object detection using a sliding-window approach.
+With the rise of convolutional networks image classification, CNNs have also been used for the prior localization step. Even though network architectures have changed, ConvNets are still used for the complete object detection pipeline. With winning ImageNet 2012 object localization challenge AlexNet showed the capabilities of CNNs for how localisation tasks <!--source -->, even though they make no publications on their specific approach [@Sermanet.2013]. The OverFeat publication [@Sermanet.2013] defined the first state-of-the-art approach by winning 2013 challenge <!-- source --> and providing a concrete explanation how ConvNets implement object detection using a sliding-window approach.
 
 Based on the networks introduced with AlexNet and OverFeat two different kinds of networks emerged as shown in figure **xy**: region proposal based and classification (or regression) based networks. The first has two stages generating region proposals first and classifying each proposal afterwards. The latter threats the detection as a regression or classification problem changing bounding boxes and classification in one stage.
 
@@ -470,7 +474,7 @@ https://arxiv.org/pdf/1807.11590.pdf
 
 ##### Region proposal network
 
-Region proposal networks (RPNs) where introduced by Regions with CNN (R-CNN){Girshick 2013 #58}. R-CNN main approach is it's modularity. One stage proposes possible regions and the next does classify these regions. The network is not determent to a specific region proposal or feature extraction method. For the ILSVRC2013 they implemented the region proposal with a selective search as shown in {Uijlings 2013 #59} and {Wang 2015 #60}. <!-- which uses itself the the powerful Bag-of-Words model for recognition and sparcial pyramid --> For feature extraction architecture AlexNet is commonly used, but for the VOC2007 and ILSVRC201 challenges they implemented VGG-16, which is slower but more accurate. For the actual classification linear SVM per class is used and overlapping bounding boxes are summarized by NMS thresholds.
+Region proposal networks (RPNs) where introduced by Regions with CNN (R-CNN)[@Girshick.2013]. R-CNN main approach is it's modularity. One stage proposes possible regions and the next does classify these regions. The network is not determent to a specific region proposal or feature extraction method. For the ILSVRC2013 they implemented the region proposal with a selective search as shown in [@Uijlings.2013] and [@Wang.2015]. <!-- which uses itself the the powerful Bag-of-Words model for recognition and sparcial pyramid --> For feature extraction architecture AlexNet is commonly used, but for the VOC2007 and ILSVRC201 challenges they implemented VGG-16, which is slower but more accurate. For the actual classification linear SVM per class is used and overlapping bounding boxes are summarized by NMS thresholds.
 
 #####  Classification/Regression based networks
 
@@ -481,10 +485,10 @@ The DeepMultiBox, often called simply MultiBox, used a single NN by implementing
 The AttentionNet was first to integrate a object existence estimation and bounding box optimization into a single convolutional network. With iterative predictions the net approximates an object. However the AttentionNet cloud only detect a single class per image.
 G-CNN in contrast is able to detect multiple classes by splitting the image into a multi-scale regular grid. Each box is classified and afterwards corrected. After multiple iterations of regression the boxes are correct. The main problem of G-CNN are small or highly overlapping objects.
 
-With its first version of YOLO introduced a new model inspired by the previous nets, but with a different architecture and a new way of regression for bounding boxes. The base architecture was inspired by the GoogLeNet using  24 Conv-layers and 2 fully connected layer together with an higher input dimension of $448\times 448$. The detection of objects is also grid based. The image is divided in a $S\times S$ grid and for each grid a single class $c \in C$ and $B$ bounding boxes, with a confidence score, are detected. The confidence of one box is defined as product of object probability with the ground truth intersection  over  union  (IOU) $Pr(Object)*IOU^{truth}_{pred}$. So the output tensor of predictions looks like: $S \times S \times (B*5+C)$. <!-- show training formular?? -->
+With its first version of YOLO introduced a new model inspired by the previous nets, but with a different architecture and a new way of regression for bounding boxes. The base architecture was inspired by the GoogLeNet using  24 Conv-layers and 2 fully connected layer together with an higher input dimension of $448\times 448$. The detection of objects is also grid based. The image is divided in a $S\times S$ grid and for each grid a single class $c \in C$ and $B$ bounding boxes, with a confidence score, are detected. The confidence of one box is defined as product of object probability with the ground truth intersection  over  union  (IOU) $Pr(Object)*IoU^{truth}_{pred}$. So the output tensor of predictions looks like: $S \times S \times (B*5+C)$. <!-- show training formular?? -->
 The first version of YOLO has problems to detect small objects in groups, which is caused by size limitations in the bounding box predication. The algorithms struggles also with aspect ratios rarely seen in the training data, because the  features used for the BB predictions are relativly coarse. <!-- explain coarse and sparse -->
 
-Based on previous approaches the Single Shot MultiBox Detector (SSD) introduced new features into single-stage detectors, mainly based on the Faster R-CNN improvements. SSD is based on the MultiBox {Erhan 2013 #62} network, but uses a VGG-16 network for the feature extraction. The SSD net has 3 major improvements in contrast to YOLOv1. Primarly it adds additional convolutional feature layers to the end of the truncated base network do detect objects on multiple scales of the feature map. Secondly the detections on the scaled layers are done with convolutional filters and the third improvement is the use of anchor boxes as proposed in Faster R-CNN. For each grid cell of the feature map predefined boxes are used, providing $(c + 4)kmn$ predictions for a $m \times n$ feature map with $c$ classes and maximal $k$ default boxes with $4$ coordinates each.
+Based on previous approaches the Single Shot MultiBox Detector (SSD) introduced new features into single-stage detectors, mainly based on the Faster R-CNN improvements. SSD is based on the MultiBox [@Erhan.2013] network, but uses a VGG-16 network for the feature extraction. The SSD net has 3 major improvements in contrast to YOLOv1. Primarly it adds additional convolutional feature layers to the end of the truncated base network do detect objects on multiple scales of the feature map. Secondly the detections on the scaled layers are done with convolutional filters and the third improvement is the use of anchor boxes as proposed in Faster R-CNN. For each grid cell of the feature map predefined boxes are used, providing $(c + 4)kmn$ predictions for a $m \times n$ feature map with $c$ classes and maximal $k$ default boxes with $4$ coordinates each.
 The use of anchor boxes and detection on multiple scales solves the aspect ratios issues of previous solutions while simultaneously improving the systems accuracy. Even tough the detection of small objects is still an issue.
 
 Further works did focus on dealing with small objects, since this is this would be the main differentiator on the COCO benchmark, which contains much more small objects than the other. Smaller objects are often filtered by the deeper convolutions, by using deconvolution layers and skip connections additional information from shallow layers can be inject into dense (deconvolution) feature maps. 
@@ -502,7 +506,7 @@ The RetinaNet paper showed that dense layers have a imbalance of foreground and 
 The Single-Shot Refinement Neural Network for Object Detection (RefineDet) is at time of this thesis the most accurate object detector with real time processing. It addresses the class imbalance problem with a new architecture of two inter-connected modules (see figure xy). The modules are called the anchor refinement module (ARM) and the object detection module (ODM). The ARM goal is to reduce the search space for the classifier by implementing a negative anchor filtering mechanism. Anchor boxes which have a top loss based on threshold i.e. $\theta = 0.99$ are not passed to the ODM module. The ratio between  for- and background patches should be below $3 : 1$. The feature layer of the ARM are converted by the Transfer Connection Blocks (TCBs) into the ODM input dimensions.  Based on the passed anchors and the TCB layers the ODM module aims to regresses accurate locations for the objects and predicts multi-class labels for each. Like previous methods the ODM uses convolutions for the regression and classification. The feature extraction ahead of the  two-step cascade regression, can be any  pretrained backbone network. For the COCO and VOC challenges the authors used VGG-16 and ResNet-101.
 
 With the success of RetinaNet the authors of YOLO published a third version. YOLOv3 brings improvements on the feature extraction network as well as on the way of classification and training.
-The new Darknet-53 feature extractor has more layers and uses  skip connections like the residual networks. It has a similar accuracy as ResNet-152 but is $2\times$ faster. The new version replaces the softmax classifier with independent logistic classifiers for each category with a binary cross-entropy loss for the class predictions. The actual predictions are perform at three different scales, similar to the Feature Pyramid Networks<!-- source -->, with a resulting tensor of  $S \times S \times [3*(4+1+C)]$. Therefore the dimension prios are have been modified. Instead of five YOLO used now 9 dimension prior which are divided by there dimension into the 3 different scales. 
+The new Darknet-53 feature extractor has more layers and uses skip connections like the residual networks. It has a similar accuracy as ResNet-152 but is $2\times$ faster. The new version replaces the softmax classifier with independent logistic classifiers for each category with a binary cross-entropy loss for the class predictions. The actual predictions are perform at three different scales, similar to the Feature Pyramid Networks<!-- source -->, with a resulting tensor of  $S \times S \times [3*(4+1+C)]$. Therefore the dimension prios are have been modified. Instead of five YOLO used now 9 dimension prior which are divided by there dimension into the 3 different scales. 
 This version of YOLO has a as higher localization error in comparison to RetinaNet and RefineDet, but is faster than first one and is better scalable in constraint environments with the adaptible input size and the sligher Tiny YOLOv3 version <!--https://github.com/pjreddie/darknet/blob/master/cfg/yolov3-tiny.cfg -->. In the course of this thesis YOLOv3 will simply be referenced as YOLO.
 
 A recent paper followed another different approach. Instead of detecting bounding box coordinates it predicts only the two locations of the top-left und bottom-right corners. For a better corner detection the algorithm introduces new kind of pooling layer as called the corner pooling. 
@@ -518,8 +522,8 @@ predicts bounding boxes using hand-picked prior-->
 
 <!-- one-object rule limits how close detected objects can be-->
 
-<!--The used a single NN by implementing a classifier known as Deformable  Part  Model (DPM) in a deep convolutional network. {Erhan 2013 #62}
-DPM is machine learning approach for object detection. It uses a part-based model, with filters based on the histogram-of-gradients detectors for feature extraction. The classification performs a latent SVM.{F Felzenszwalb 2010 #61}-->
+<!--The used a single NN by implementing a classifier known as Deformable  Part  Model (DPM) in a deep convolutional network. [@Erhan.2013]
+DPM is machine learning approach for object detection. It uses a part-based model, with filters based on the histogram-of-gradients detectors for feature extraction. The classification performs a latent SVM.[@F.Felzenszwalb.2010] -->
 
 ##### Review
 
